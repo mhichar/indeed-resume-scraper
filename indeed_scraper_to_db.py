@@ -11,13 +11,16 @@ import threading
 from random import randint
 from time import sleep
 import os
+import boto
+import boto3
 
 class Resume(object):
 
-	def __init__ (self, idd, jobs, schools):
+	def __init__ (self, idd, jobs, schools, skills):
 		self.id = idd
 		self.jobs = jobs
 		self.schools = schools
+		self.skills = skills
 
 	def toJSON(self):
 		return json.dumps(self, default=lambda o: o.__dict__, 
@@ -100,7 +103,14 @@ def gen_resume(idd, driver):
 	except:
 		pass
 
-	return Resume(idd, jobs, schools)
+	try:
+		headers=soup.find_all('span', attrs={'class':'rezemp-ResumeDisplaySection-header icl-u-textColor--tertiary'})
+		if headers[2].get_text()=='Skills':
+			skills=results[2].get_text()
+	except:
+		pass
+	
+	return Resume(idd, jobs, schools, skills)
 
 
 
@@ -115,8 +125,10 @@ def mine(name, URL, override=True, rangee=None):
 
 
 	if rangee == None:	
-		start_index = 700
-		target = 10901
+		# start_index = 700
+		# target = 10901
+		start_index=0
+		target=100
 	else:
 		start_index = rangee[0]
 		target = rangee[1]
@@ -159,7 +171,7 @@ def mine_multi(name, url, override=True):
 	names = []
 
 	target = 100
-	tr = 8
+	tr = 4
 	for i in range(tr):
 		# Instantiates the thread
 		# (i) does not make a sequence, so (i,)
@@ -209,7 +221,7 @@ def main():
 
 	#consolidate_files("lawyer-california", ["resume_outputlawyer-california" + str(i) +".json" for i in range(8)])
 
-	mine_multi("data-scientist-New-York", URL)
+	mine_multi("DS-NY", URL)
 
 
 	print(time.clock() - t),

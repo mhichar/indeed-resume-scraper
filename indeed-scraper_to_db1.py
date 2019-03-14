@@ -158,7 +158,7 @@ def mine_multi(name, url, override=True):
 	thread_list = []
 	names = []
 
-	target = 100
+	target = 10
 	tr = 8
 	for i in range(tr):
 		# Instantiates the thread
@@ -196,7 +196,7 @@ def main():
 
 
 
-	t = time.clock()
+	t = time.clock();
 
 	#idds = ["f845ad88e3d17704", "1992c61c49a470e1"]
 
