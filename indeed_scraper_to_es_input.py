@@ -253,8 +253,8 @@ def mine_multi(name, url, override=True):
 	thread_list = []
 	names = []
 
-	target = input('number of resumes: ')
-	tr = input('threads')
+	target = int(input('number of resumes: '))
+	tr = int(input('threads'))
 	for i in range(tr):
 		# Instantiates the thread
 		# (i) does not make a sequence, so (i,)
