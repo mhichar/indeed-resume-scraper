@@ -47,7 +47,7 @@ class Job(object):
 		self.company = company
 		self.location = location
 		self.hire_date = hire_date
-		self.end_date=end_date
+		self.end_date = end_date
 
 class School(object):
 	def __init__(self, degree, school_name, grad_date):
@@ -82,13 +82,16 @@ def gen_idds(url, driver):
 #print(idds)
 
 def gen_resume(idd, driver):
+	# get url for a single resume to scrape
 	URL = '''https://resumes.indeed.com/resume/''' + idd
-
 
 	driver.get(URL)
 	p_element = driver.page_source
 	soup = BeautifulSoup(p_element, 'html.parser')
 
+	# results contains soup object for all the major sections of a resume
+	# including work experience, education, skills, additional information
+	# does not contain intro, links, etc
 	results = soup.find_all('div', attrs={"class":"rezemp-ResumeDisplaySection"})
 	#print(results)
 
@@ -105,6 +108,7 @@ def gen_resume(idd, driver):
 			degree = uni.find(class_ = "rezemp-ResumeDisplay-itemTitle").get_text().strip()
 			university = uni.find(class_="rezemp-ResumeDisplay-university").contents[0].get_text().strip()
 			date = uni.find(class_="rezemp-ResumeDisplay-date").get_text().strip()
+			# print('strip() worked: school')
 			schools.append(School(degree, university, date))
 	except:
 		print('end of education or could not retrive education')
@@ -120,12 +124,19 @@ def gen_resume(idd, driver):
 		job_descriptions = work_experience.find_all(class_="rezemp-u-h5")
 		for i in range(len(job_titles)):
 			dates = job_descriptions[i].find_next_sibling().get_text()
-			date = dates[:dates.find("to")]
-			title = job_titles[i].get_text()
+			# print('-->'+dates+'<--dates')
+			start_date = dates[:dates.find("to")].strip()
+			end_date = dates[dates.find("to")+3:].strip()
+			# print('-->'+start_date+'<--start date')
+			# print('-->'+end_date+'<--end date')
+			title = job_titles[i].get_text().strip()
+			# print('strip() worked: title')
 			desc = [p.get_text() for p in job_descriptions[i].find_all("span")][1:]
-			company = desc[0]
-			location = desc[1]
-			jobs.append(Job(title, company, location, date))
+			company = desc[0].strip()
+			# print('strip() worked: company')
+			location = desc[1].strip()
+			# print('strip() worked: location')
+			jobs.append(Job(title, company, location, start_date, end_date))
 	except:
 		print('could not retrive work experiences')
 
@@ -142,7 +153,15 @@ def gen_resume(idd, driver):
 			content = content[6:].split(',')
 			for skl in content:
 				slp = skl.split('(')  # slp = skill_length_pair
-				skills.append(Skill(slp[0], slp[1]))
+				if slp[1].startswith("Less than 1"):
+					skills.append(Skill(slp[0].strip(), '<1'))
+					# print(slp[0].strip(), '<1')
+				elif slp[1].startswith("1 "):
+					skills.append(Skill(slp[0].strip(), '1'))
+					# print(slp[0].strip(), '1')
+				else:
+					skills.append(Skill(slp[0].strip(), slp[1][:-7].strip()))
+					# print(slp[0].strip(), slp[1][:-7].strip())
 
 
 	except:
@@ -183,6 +202,7 @@ def mine(name, URL, override=True, rangee=None):
 	if rangee == None:	
 		start_index = 0
 		target = 1050
+		target = 1	# use this for testing
 	else:
 		start_index = rangee[0]
 		target = rangee[1]
@@ -217,7 +237,7 @@ def mine(name, URL, override=True, rangee=None):
 
 		for idd in idds:
 			js = gen_resume(idd,driver).toJSON()
-			print(js)
+			# print(js)
 			es.index(index='id',body=js, doc_type='resume')
 
 		start_index+=50
@@ -233,8 +253,8 @@ def mine_multi(name, url, override=True):
 	thread_list = []
 	names = []
 
-	target = 100
-	tr = 4
+	target = input('number of resumes: ')
+	tr = input('threads')
 	for i in range(tr):
 		# Instantiates the thread
 		# (i) does not make a sequence, so (i,)
@@ -266,6 +286,8 @@ def consolidate_files(name, names):
 		os.remove(nam)
 			
 	file.close()
+
+
 
 
 
