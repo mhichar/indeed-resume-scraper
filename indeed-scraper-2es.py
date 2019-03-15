@@ -272,7 +272,10 @@ def main():
 
 
 
-	t = time.clock();
+	t = time.clock()
+	search_terms= input('Search terms: ')
+	location= input('Location: ')
+	fle = input('File Name: ')
 
 	#idds = ["f845ad88e3d17704", "1992c61c49a470e1"]
 
@@ -288,8 +291,8 @@ def main():
 	# URL = "https://resumes.indeed.com/search?q=data+scientist&l=chicago&searchFields="
 	# mine("datascientist_chicago", URL)
 
-	URL = "https://resumes.indeed.com/search?q=software+engineer&l=New+York&searchFields="
-	mine_multi("SE_NY", URL)
+	URL = "https://resumes.indeed.com/search?q="+search_terms+"&l="+location+"&searchFields="
+	mine_multi(fle, URL)
 
 	# URL = "https://resumes.indeed.com/search?q=data+scientist&l=california&searchFields="
 	# mine("datascientist_california", URL)
