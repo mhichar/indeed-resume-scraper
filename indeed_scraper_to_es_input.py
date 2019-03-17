@@ -263,7 +263,7 @@ def mine_multi(name, url, override=True, headless=0):
 	names = []
 
 	target = int(input('number of resumes: '))
-	tr = int(input('threads'))
+	tr = int(input('threads: '))
 	for i in range(tr):
 		# Instantiates the thread
 		# (i) does not make a sequence, so (i,)
@@ -306,7 +306,7 @@ def main():
 
 	t = time.clock()
 	search_terms= str(input('Search terms: '))
-	search_terms.replace(' ','+')
+	search_terms=search_terms.replace(' ','+')
 	location= input('Location: ')
 	fle = input('File Name: ')
 	headless= int(input('Headless(0/1): '))
