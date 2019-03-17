@@ -3,6 +3,7 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import time
@@ -187,8 +188,17 @@ def gen_resume(idd, driver):
 
 
 
-def mine(name, URL, override=True, rangee=None):
-	driver = webdriver.Chrome()
+def mine(name, URL, override=True, rangee=None, headless=0):
+	#driver = webdriver.Chrome()
+
+	# For Headless
+	options = Options()
+	
+	if headless:
+		options.headless = True
+	
+	driver = webdriver.Chrome(options=options)
+
 	# print('driver created\nNow waiting...')
 	driver.implicitly_wait(10)
 	# print('wait over')
@@ -247,8 +257,7 @@ def mine(name, URL, override=True, rangee=None):
 	driver.close()
 
 
-def mine_multi(name, url, override=True):
-
+def mine_multi(name, url, override=True, headless=0):
 
 	thread_list = []
 	names = []
@@ -258,7 +267,7 @@ def mine_multi(name, url, override=True):
 	for i in range(tr):
 		# Instantiates the thread
 		# (i) does not make a sequence, so (i,)
-		t = threading.Thread(target=mine, args=(name+str(i),url,), kwargs={"override" : override, "rangee" : (i*(target//tr), (i+1)*(target//tr)),})
+		t = threading.Thread(target=mine, args=(name+str(i),url,), kwargs={"override" : override, "rangee" : (i*(target//tr), (i+1)*(target//tr)),'headless':headless})
 		# Sticks the thread in a list so that it remains accessible
 		thread_list.append(t)
 		names.append("resume_output_" + name + str(i) +".json")
@@ -296,9 +305,11 @@ def main():
 
 
 	t = time.clock()
-	search_terms= input('Search terms: ')
+	search_terms= str(input('Search terms: '))
+	search_terms.replace(' ','+')
 	location= input('Location: ')
 	fle = input('File Name: ')
+	headless= int(input('Headless(0/1): '))
 
 	#idds = ["f845ad88e3d17704", "1992c61c49a470e1"]
 
@@ -315,7 +326,7 @@ def main():
 	# mine("datascientist_chicago", URL)
 
 	URL = "https://resumes.indeed.com/search?q="+search_terms+"&l="+location+"&searchFields="
-	mine_multi(fle, URL)
+	mine_multi(fle, URL,headless)
 
 	# URL = "https://resumes.indeed.com/search?q=data+scientist&l=california&searchFields="
 	# mine("datascientist_california", URL)
