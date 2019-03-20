@@ -155,13 +155,13 @@ def gen_resume(idd, driver):
 			for skl in content:
 				slp = skl.split('(')  # slp = skill_length_pair
 				if slp[1].startswith("Less than 1"):
-					skills.append(Skill(slp[0].strip(), '<1'))
+					skills.append(Skill(slp[0].strip(), int(0)))
 					# print(slp[0].strip(), '<1')
 				elif slp[1].startswith("1 "):
-					skills.append(Skill(slp[0].strip(), '1'))
+					skills.append(Skill(slp[0].strip(), int(1)))
 					# print(slp[0].strip(), '1')
 				else:
-					skills.append(Skill(slp[0].strip(), slp[1][:-7].strip()))
+					skills.append(Skill(slp[0].strip(), int(slp[1][:-7].strip().strip('+'))))
 					# print(slp[0].strip(), slp[1][:-7].strip())
 
 
