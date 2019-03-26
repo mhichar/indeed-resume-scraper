@@ -20,7 +20,7 @@ import boto3
 import requests
 from requests_aws4auth import AWS4Auth
 from elasticsearch import Elasticsearch
-es=Elasticsearch(hosts='https://search-cap-resume-es-fu3rqbrrqvbmeql5pfeal4nx3m.us-east-1.es.amazonaws.com')
+es=Elasticsearch(hosts='https://search-pop-demo-7jprplf4bvozpitot3lfj6lw5a.us-east-1.es.amazonaws.com/')
 
 region='us-east-1'
 service='es'
@@ -141,8 +141,8 @@ def gen_resume(idd, driver):
 		for i in range(len(job_titles)):
 			dates = content[i].find_next_sibling().get_text()
 			# print('-->'+dates+'<--dates')
-			start_date = dates[:dates.find("to")].strip()
-			end_date = dates[dates.find("to")+3:].strip()
+			start_date = dates[:dates.find(" to ")].strip()
+			end_date = dates[dates.find(" to ")+4:].strip()
 			# print('-->'+start_date+'<--start date')
 			# print('-->'+end_date+'<--end date')
 			title = job_titles[i].get_text().strip()
@@ -264,7 +264,10 @@ def mine(name, URL, override=True, rangee=None, headless=0):
 		for idd in idds:
 			js = gen_resume(idd,driver).toJSON()
 			# print(js)
-			es.index(index='id',body=js, doc_type='resume')
+			# es.index(index='resumes',body=js, doc_type='indeed_resume', id=idd)
+			
+			# Test mapping
+			es.index(index='resumes1',body=js, doc_type='mydocs', id=idd)
 
 		start_index+=50
 
